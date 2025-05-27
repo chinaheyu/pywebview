@@ -26,7 +26,7 @@ clr.AddReference('System.Reflection')
 
 import System.Windows.Forms as WinForms
 from System import Environment, Func, Int32, IntPtr, Type, UInt32, Array, Object
-from System.Drawing import Color, ColorTranslator, Icon, Point, Size, SizeF
+from System.Drawing import Color, ColorTranslator, Icon, Point, Size, SizeF, Rectangle
 from System.Threading import ApartmentState, Thread, ThreadStart
 from System.Reflection import Assembly, BindingFlags
 from Microsoft.Win32 import SystemEvents
@@ -573,7 +573,8 @@ class BrowserView:
         def maximize(self):
             def _maximize():
                 if self.frameless:
-                    self.MaximizedBounds = WinForms.Screen.FromControl(self).WorkingArea
+                    WorkingArea = WinForms.Screen.FromControl(self).WorkingArea
+                    self.MaximizedBounds = Rectangle(0, 0, WorkingArea.Width, WorkingArea.Height)
                 self.WindowState = WinForms.FormWindowState.Maximized
 
             self.Invoke(Func[Type](_maximize))

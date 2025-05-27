@@ -572,6 +572,8 @@ class BrowserView:
 
         def maximize(self):
             def _maximize():
+                if self.frameless:
+                    self.MaximizedBounds = WinForms.Screen.FromControl(self).WorkingArea
                 self.WindowState = WinForms.FormWindowState.Maximized
 
             self.Invoke(Func[Type](_maximize))

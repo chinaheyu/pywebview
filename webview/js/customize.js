@@ -54,11 +54,11 @@
 
     // calculate possible resizing direction
     function possibleResizingDirection(ev) {
-        const regionSize = 5;
-        const nearLeft = ev.clientX < regionSize;
-        const nearRight = window.innerWidth - ev.clientX < regionSize;
-        const nearTop = ev.clientY < regionSize;
-        const nearBottom = window.innerHeight - ev.clientY < regionSize;
+        var resizeRegionSize = 5;
+        var nearLeft = ev.clientX < resizeRegionSize;
+        var nearRight = window.innerWidth - ev.clientX < resizeRegionSize;
+        var nearTop = ev.clientY < resizeRegionSize;
+        var nearBottom = window.innerHeight - ev.clientY < resizeRegionSize;
 
         if (nearLeft && nearTop)
             return 'nw';
@@ -81,10 +81,12 @@
 
     // override cursor style to indicate resizable region
     function overrideCursorStyle(direction) {
+        var cursorStyle = document.getElementById('cursor-style');
         if (direction === "") {
-            document.getElementById('cursor-style')?.remove();
+            if (cursorStyle !== null) {
+                cursorStyle.remove();
+            }
         } else {
-            let cursorStyle = document.getElementById('cursor-style');
             if (cursorStyle === null) {
                 cursorStyle = document.createElement('style');
                 cursorStyle.id = 'cursor-style';
@@ -97,9 +99,9 @@
     function onMouseMove(ev) {
         // handle resizing
         if (easyResize && mouseState.isResizing) {
-            let w = mouseState.initialWidth;
-            let h = mouseState.initialHeight;
-            let fixPoint = 0;
+            var w = mouseState.initialWidth;
+            var h = mouseState.initialHeight;
+            var fixPoint = 0;
 
             switch (mouseState.resizingDirection) {
                 case "nw":
@@ -181,8 +183,9 @@
 
     function onMouseDown(ev) {
         if (easyResize) {
-            const direction = possibleResizingDirection(ev);
+            var direction = possibleResizingDirection(ev);
             if (direction !== "") {
+                ev.preventDefault();
                 startResizingWindow(ev, direction);
                 return;
             }
@@ -198,11 +201,20 @@
         dragBlocks[i].addEventListener('mousedown', startMovingWindow);
     }
 
-    // listen mousedown forever event for moving and resizing
-    window.addEventListener('mousedown', onMouseDown);
+    // listen mousedown event for trigger moving and resizing
+    if (easyDrag || easyResize) {
+        window.addEventListener('mousedown', onMouseDown);
+    }
 
-    // listen mousemove forever event for change cursor
+    // listen mousemove event for moving and resizing
     window.addEventListener('mousemove', onMouseMove);
+
+    if (easyResize) {
+        // hide native scrollbar
+        var hideScrollbarStyle = document.createElement('style');
+        hideScrollbarStyle.innerHTML = '::-webkit-scrollbar{display:none}';
+        document.body.appendChild(hideScrollbarStyle)
+    }
 
     if ('%(zoomable)s' === 'False') {
         document.body.addEventListener('touchstart', function(e) {

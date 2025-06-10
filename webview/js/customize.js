@@ -181,7 +181,7 @@
         window.addEventListener('mouseup', onMouseUp);
     }
 
-    function onMouseDown(ev) {
+    function onMouseDown(ev, fromDragBlock = false) {
         if (easyResize) {
             var direction = possibleResizingDirection(ev);
             if (direction !== "") {
@@ -193,12 +193,17 @@
 
         if (easyDrag) {
             startMovingWindow(ev);
+            return;
+        }
+
+        if (fromDragBlock) {
+            startMovingWindow(ev);
         }
     }
 
     var dragBlocks = document.querySelectorAll('%(drag_selector)s');
     for (var i=0; i < dragBlocks.length; i++) {
-        dragBlocks[i].addEventListener('mousedown', startMovingWindow);
+        dragBlocks[i].addEventListener('mousedown', (ev) => onMouseDown(ev, true));
     }
 
     // listen mousedown event for trigger moving and resizing
